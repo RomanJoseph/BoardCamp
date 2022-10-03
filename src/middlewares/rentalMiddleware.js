@@ -83,8 +83,7 @@ async function validateRentalIdInput (req, res, next) {
 
     try {
         const validRental = await connection.query(
-            `SELECT * FROM rentals WHERE id = $1;`,
-            [id]
+            `SELECT * FROM rentals WHERE id = $1;`,[id]
         );
         if (validRental.rows.length === 0) {
             return res.status(404).send('Id não encontrado');
@@ -93,8 +92,6 @@ async function validateRentalIdInput (req, res, next) {
     } catch (error) {
         return res.status(500).send(error);
     };
-
-    console.log(returnDate)
 
     if (rentalObj.returnDate) {
         return res.status(400).send('O empréstimo já acabou');
