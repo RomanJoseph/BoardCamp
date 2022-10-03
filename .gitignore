@@ -1,2 +1,3 @@
-node_mudelos
-.dotenv
+node_modules
+boardcamp-front-main
+.env
