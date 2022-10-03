@@ -8,6 +8,7 @@ async function validateQueryFilterCustomers (req, res, next) {
         filter = stripHtml(req.query.cpf).result;
     };
     res.locals.filter = filter;
+    console.log("AAAA")
     next();
 }
 
@@ -15,6 +16,7 @@ async function validateCustomerId (req, res, next) {
     let id = stripHtml(req.params.ID).result;
 
     try {
+        console.log(id)
         const validCustomer = await connection.query(
             `SELECT * FROM customers WHERE id = $1`,[id]
         );
@@ -40,15 +42,15 @@ async function validateCustomer (req, res, next) {
 
     res.locals.customer = customer;
     next();
+
 }
 
 async function validateNewCpf (req, res, next) {
     const customer = res.locals.customer;
     const id = res.locals.id;
-
     try {
         const validCpf = await connection.query(
-            `SELECT * FROM customers WHERE cpf = $1`,[stripHtml(customer.cpf).result]
+            `SELECT * FROM customers WHERE cpf = $1`,[stripHtml(customer[0].cpf).result]
         );
         if (validCpf.rows.length !== 0){
             if (!id || Number(id) !== Number(validCpf.rows[0].id)){
@@ -58,7 +60,7 @@ async function validateNewCpf (req, res, next) {
     } catch (error) {
         return res.status(500).send(error);
     }
-    res.locals.customer = {...customer,name: stripHtml(customer.name).result }
+    res.locals.customer = {...customer,name: stripHtml(customer[0].name).result }
     next();
 }
 
