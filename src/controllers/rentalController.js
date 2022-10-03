@@ -9,7 +9,7 @@ async function getRentals (req, res) {
 
     try {
         const rentalsDB = await connection.query(
-            `SELECTnrentals.*,
+            `SELECT rentals.*,
                 customers.id AS customer_id,
                 customers.name AS customer_name,
                 games.id AS game_id,
@@ -54,13 +54,14 @@ async function getRentals (req, res) {
 
         res.send(rentals);
     } catch (error) {
+        console.log(error)
         res.status(500).send(error);
     }
 }
 
 async function postNewRental (req, res) {
     const rentalObj = res.locals.rentalObj;
-    const { pricePerDay } = res.locals.gameObj;
+    const { pricePerDay } = res.locals.game;
 
     const originalPrice = rentalObj.daysRented * pricePerDay
 

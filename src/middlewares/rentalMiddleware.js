@@ -19,7 +19,7 @@ async function validateQueryFilterRentals (req, res, next) {
 
 async function validateRentalInputs (req, res, next) {
     const rentalObj = req.body;
-    let gameObj = null;
+    let game = null;
 
     const validation = rentalSchema.validate(rentalObj, {abortEarly: false});
     if (validation.error){
@@ -32,7 +32,7 @@ async function validateRentalInputs (req, res, next) {
             [rentalObj.customerId]
         );
         if (validId.rows.length === 0){
-            return res.status(400).send('customerId not found');
+            return res.status(400).send('Cliente não encontrado');
         }
     } catch (error) {
         return res.status(500).send(error);
@@ -44,9 +44,9 @@ async function validateRentalInputs (req, res, next) {
             [rentalObj.gameId]
         );
         if (validGame.rows.length === 0){
-            return res.status(400).send('gameId not found');
+            return res.status(400).send('Jogo não encontrado');
         }
-        gameObj = validGame.rows[0];
+        game = validGame.rows[0];
     } catch (error) {
         return res.status(500).send(error);
     }
@@ -58,18 +58,17 @@ async function validateRentalInputs (req, res, next) {
                 "gameId" = $1
                 AND
                 "returnDate" IS NULL
-            ;`,
-            [rentalObj.gameId]
+            ;`,[rentalObj.gameId]
         );
-        if (rentalQnt.rows.length >= gameObj.stockTotal){
-            return res.status(400).send('game not available');
+        if (rentalQnt.rows.length >= game.stockTotal){
+            return res.status(400).send('Jogo não disponível');
         }
     } catch (error) {
         return res.status(500).send(error);
     }
 
     res.locals.rentalObj = rentalObj;
-    res.locals.gameObj = gameObj;
+    res.locals.game = game;
 
     next();
 }
@@ -79,7 +78,7 @@ async function validateRentalIdInput (req, res, next) {
     let rentalObj = null;
 
     if (isNaN(id)){
-        return res.status(400).send('invalid id');
+        return res.status(400).send('Id inválido');
     };
 
     try {
@@ -88,15 +87,17 @@ async function validateRentalIdInput (req, res, next) {
             [id]
         );
         if (validRental.rows.length === 0) {
-            return res.status(404).send('id not found');
+            return res.status(404).send('Id não encontrado');
         }
         rentalObj = validRental.rows[0];
     } catch (error) {
         return res.status(500).send(error);
     };
 
+    console.log(returnDate)
+
     if (rentalObj.returnDate) {
-        return res.status(400).send('rental already finished');
+        return res.status(400).send('O empréstimo já acabou');
     }
     
     res.locals.rentalObj = rentalObj;
